@@ -18,6 +18,7 @@ const App = () => {
         smoothWheel: true, // Enable smooth scrolling for mouse wheel
         smoothTouch: true, // Enable smooth scrolling on touch devices
         duration: 2.5, // Adjust the duration of the scroll animation
+        touchMultiplier: 1.5, // Adjust scrolling speed on touch devices
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing function
       }}
     >
