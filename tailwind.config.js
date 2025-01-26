@@ -9,6 +9,7 @@ export default {
         "circular-web": ["circular-web", "sans-serif"],
         "robert-medium": ["robert-medium", "sans-serif"],
         "robert-regular": ["robert-regular", "sans-serif"],
+        "futura-hv": ["futura-hv", "sans-serif"],
       },
       colors: {
         blue: {
@@ -25,6 +26,15 @@ export default {
           100: "#8e983f",
           300: "#edff66",
         },
+        berkut: {
+          skin: "#FBF2C0",
+          dark: "#4A372B",
+          tint: "#E4A05F",
+          light: "#F7F3E3",
+        },
+      },
+      transitionTimingFunction: {
+        custom: "cubic-bezier(0.76, 0, 0.24, 1)",
       },
     },
   },

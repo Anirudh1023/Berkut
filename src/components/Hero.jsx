@@ -1,171 +1,178 @@
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/all";
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { TiLocationArrow } from "react-icons/ti";
-import { useEffect, useRef, useState } from "react";
-
 import Button from "./Button";
+import gsap from "gsap";
 
-gsap.registerPlugin(ScrollTrigger);
+// Custom hook to track mouse position
+const useMousePosition = () => {
+  const [mousePosition, setMousePosition] = useState({ x: null, y: null });
 
-const Hero = () => {
-  const [currentIndex, setCurrentIndex] = useState(1);
-  const [hasClicked, setHasClicked] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-  const [loadedVideos, setLoadedVideos] = useState(0);
-
-  const totalVideos = 4;
-  const nextVdRef = useRef(null);
-
-  const handleVideoLoad = () => {
-    setLoadedVideos((prev) => prev + 1);
+  const updateMousePosition = (e) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
   };
 
   useEffect(() => {
-    if (loadedVideos === totalVideos - 1) {
-      setLoading(false);
-    }
-  }, [loadedVideos]);
+    window.addEventListener("mousemove", updateMousePosition);
+    return () => window.removeEventListener("mousemove", updateMousePosition);
+  }, []);
 
-  const handleMiniVdClick = () => {
-    setHasClicked(true);
+  return mousePosition;
+};
 
-    setCurrentIndex((prevIndex) => (prevIndex % totalVideos) + 1);
-  };
+export default function Home() {
+  const [isMouseMoving, setIsMouseMoving] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0); // Track current image index
+  const [nextIndex, setNextIndex] = useState(1);
+  const { x, y } = useMousePosition();
+  const size = isMouseMoving ? 250 : 100; // Large when moving, small when stationary
 
-  useGSAP(
-    () => {
-      if (hasClicked) {
-        gsap.set("#next-video", { visibility: "visible" });
-        gsap.to("#next-video", {
-          transformOrigin: "center center",
-          scale: 1,
-          width: "100%",
-          height: "100%",
-          duration: 1,
-          ease: "power1.inOut",
-          onStart: () => nextVdRef.current.play(),
-        });
-        gsap.from("#current-video", {
-          transformOrigin: "center center",
-          scale: 0,
-          duration: 1.5,
-          ease: "power1.inOut",
-        });
-      }
-    },
-    {
-      dependencies: [currentIndex],
-      revertOnUpdate: true,
-    }
-  );
+  // Define the images array
+  const images = [
+    "img/Hero3.jpg",
+    "img/Hero5.jpg",
+    "img/Hero1.jpg",
+    "img/Hero2.jpg",
+    "img/Hero4.jpg",
+    "img/Hero6.jpg",
+  ];
 
-  useGSAP(() => {
-    gsap.set("#video-frame", {
-      clipPath: "polygon(14% 0, 72% 0, 88% 90%, 0 95%)",
-      borderRadius: "0% 0% 40% 10%",
-    });
-    gsap.from("#video-frame", {
-      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-      borderRadius: "0% 0% 0% 0%",
+  // Ref for the mask element
+  const maskRef = useRef(null);
+
+  // Ref to track currentIndex independently of React state
+  const currentIndexRef = useRef(currentIndex);
+  useEffect(() => {
+    currentIndexRef.current = currentIndex; // Sync ref with state
+  }, [currentIndex]);
+
+  // Flag to prevent multiple updates
+  const isUpdatedRef = useRef(false);
+
+  // Track mouse movement
+  useEffect(() => {
+    let movementTimer;
+
+    const handleMouseMove = () => {
+      setIsMouseMoving(true); // Mouse is moving
+      clearTimeout(movementTimer);
+
+      // Set a timeout to detect when the mouse stops moving
+      movementTimer = setTimeout(() => {
+        setIsMouseMoving(false); // Mouse has stopped moving
+      }, 100); // Adjust the delay as needed
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      clearTimeout(movementTimer);
+    };
+  }, []);
+
+  // Handle click to cycle through images with GSAP animation
+  const handleClick = () => {
+    console.log("Mask Ref:", maskRef.current); // Debugging
+    if (!maskRef.current) return; // Ensure the ref exists
+
+    // Reset the flag
+    isUpdatedRef.current = false;
+
+    const animation = gsap.to(maskRef.current, {
+      maskSize: "150%",
+      WebkitMaskPosition: "center",
+      duration: 2,
       ease: "power1.inOut",
-      scrollTrigger: {
-        trigger: "#video-frame",
-        start: "center center",
-        end: "bottom center",
-        scrub: true,
+      onUpdate: () => {
+        // Access the progress of the animation
+        const progress = animation.progress();
+        if (progress > 0.7 && !isUpdatedRef.current) {
+          // Update currentIndex using the ref
+          const newIndex = (currentIndexRef.current + 1) % images.length;
+          setCurrentIndex(newIndex); // Update state
+          currentIndexRef.current = newIndex; // Update ref
+          isUpdatedRef.current = true; // Set the flag to prevent further updates
+        }
+      },
+      onComplete: () => {
+        console.log(currentIndex, nextIndex); // Debugging
+        setNextIndex((prevIndex) => (prevIndex + 1) % images.length);
+        gsap.set(maskRef.current, {
+          maskSize: `${size}px`,
+          WebkitMaskPosition: `${x - size / 2}px ${y - size / 2}px`,
+        });
       },
     });
-  });
-
-  const getVideoSrc = (index) => `videos/hero-${index}.mp4`;
+  };
 
   return (
-    <div className="relative h-dvh w-screen overflow-x-hidden">
-      {loading && (
-        <div className="flex-center absolute z-[100] h-dvh w-screen overflow-hidden bg-violet-50">
-          {/* https://uiverse.io/G4b413l/tidy-walrus-92 */}
-          <div className="three-body">
-            <div className="three-body__dot"></div>
-            <div className="three-body__dot"></div>
-            <div className="three-body__dot"></div>
-          </div>
-        </div>
-      )}
-
-      <div
-        id="video-frame"
-        className="relative z-10 h-dvh w-screen overflow-hidden rounded-lg bg-blue-75"
+    <main
+      className="h-screen relative flex items-center justify-center z-10 bg-white overflow-hidden"
+      onClick={handleClick} // Click to cycle images
+    >
+      {/* Mask Section */}
+      <motion.div
+        ref={maskRef}
+        className="absolute w-full h-full flex items-center justify-center cursor-default"
+        style={{
+          maskImage: "url('img/mask.svg')",
+          maskRepeat: "no-repeat",
+          maskSize: `${size}px`,
+          backgroundColor: "#ec4e39",
+        }}
+        animate={{
+          WebkitMaskPosition: `${x - size / 2}px ${y - size / 2}px`,
+          WebkitMaskSize: `${size}px`,
+        }}
+        transition={{ type: "tween", ease: "backOut", duration: 0.5 }}
       >
-        <div>
-          <div className="mask-clip-path absolute-center absolute z-50 size-64 cursor-pointer overflow-hidden rounded-lg">
-            <div
-              onClick={handleMiniVdClick}
-              className="origin-center scale-50 opacity-0 transition-all duration-500 ease-in hover:scale-100 hover:opacity-100"
-            >
-              <video
-                ref={nextVdRef}
-                src={getVideoSrc((currentIndex % totalVideos) + 1)}
-                loop
-                muted
-                id="current-video"
-                className="size-64 origin-center scale-150 object-cover object-center"
-                onLoadedData={handleVideoLoad}
-              />
-            </div>
-          </div>
-
-          <video
-            ref={nextVdRef}
-            src={getVideoSrc(currentIndex)}
-            loop
-            muted
-            id="next-video"
-            className="absolute-center invisible absolute z-20 size-64 object-cover object-center"
-            onLoadedData={handleVideoLoad}
-          />
-          <video
-            src={getVideoSrc(
-              currentIndex === totalVideos - 1 ? 1 : currentIndex
-            )}
-            autoPlay
-            loop
-            muted
-            className="absolute left-0 top-0 size-full object-cover object-center"
-            onLoadedData={handleVideoLoad}
+        <div className="w-full h-full">
+          <img
+            src={images[nextIndex]} // Current image
+            alt={`Image ${currentIndex + 1}`}
+            className="w-full h-full object-cover"
           />
         </div>
+      </motion.div>
 
-        <h1 className="special-font hero-heading absolute bottom-5 right-5 z-40 text-blue-75">
-          G<b>A</b>MING
-        </h1>
-
-        <div className="absolute left-0 top-0 z-40 size-full">
-          <div className="mt-24 px-5 sm:px-10">
-            <h1 className="special-font hero-heading text-blue-100">
-              redefi<b>n</b>e
-            </h1>
-
-            <p className="mb-5 max-w-64 font-robert-regular text-blue-100">
-              Enter the Metagame Layer <br /> Unleash the Play Economy
-            </p>
-
-            <Button
-              id="watch-trailer"
-              title="Watch trailer"
-              leftIcon={<TiLocationArrow />}
-              containerClass="bg-yellow-300 flex-center gap-1"
-            />
-          </div>
+      {/* Body Section */}
+      <div className="w-full h-full flex items-center justify-center cursor-default">
+        <div className="w-full h-full">
+          <img
+            src={images[currentIndex]} // Next image in the cycle
+            alt={`Image ${((currentIndex + 1) % images.length) + 1}`}
+            className="w-full h-full object-cover"
+          />
         </div>
       </div>
 
-      <h1 className="special-font hero-heading absolute bottom-5 right-5 text-black">
-        G<b>A</b>MING
+      {/* Text and Button Elements from the First Code */}
+      <h1 className="font-futura-hv hero-heading absolute bottom-5 right-5 z-40 text-berkut-skin">
+        TRAVEL
       </h1>
-    </div>
-  );
-};
 
-export default Hero;
+      <div className="absolute left-0 top-0 z-40 size-full">
+        <div className="mt-24 px-5 sm:px-10">
+          <h1 className="font-futura-hv hero-heading text-berkut-dark">
+            REDEFINE
+          </h1>
+
+          <p className="mb-5 max-w-100 font-robert-regular text-berkut-skin">
+            Small group adventures that bring you the moments only Intrepid can
+            offer.
+            <br />
+            Only here. Only now. Only Intrepid.
+          </p>
+
+          <Button
+            id="watch-trailer"
+            title="Know More"
+            leftIcon={<TiLocationArrow />}
+            containerClass="bg-berkut-tint flex-center gap-1 !bg-berkut-tint"
+          />
+        </div>
+      </div>
+    </main>
+  );
+}
