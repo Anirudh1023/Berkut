@@ -87,7 +87,7 @@ export default function Home() {
       onUpdate: () => {
         // Access the progress of the animation
         const progress = animation.progress();
-        if (progress > 0.9 && !isUpdatedRef.current) {
+        if (progress > 0.7 && !isUpdatedRef.current) {
           // Update currentIndex using the ref
           const newIndex = (currentIndexRef.current + 1) % images.length;
           setCurrentIndex(newIndex); // Update state
