@@ -97,9 +97,11 @@ const About = () => {
             key={currentIndex} // Add key prop to force re-render
             src={carouselItems[currentIndex].image}
             alt="Background"
-            className="absolute left-0 top-0 size-full object-cover"
+            className="absolute left-0 top-0 size-full object-cover will-change-[opacity]" // Added will-change here
           />
-          <div className="absolute top-20 left-20 text-berkut-skin font-futura-hv md:text-8xl text-3xl">
+          <div
+            className="absolute top-20 left-20 text-berkut-skin font-futura-hv md:text-8xl text-3xl will-change-[transform]" // Added will-change for text animation
+          >
             {carouselItems[currentIndex].text}
           </div>
         </div>
