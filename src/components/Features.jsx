@@ -1,29 +1,45 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { TiLocationArrow } from "react-icons/ti";
 
 export const BentoTilt = ({ children, className = "" }) => {
   const [transformStyle, setTransformStyle] = useState("");
   const itemRef = useRef(null);
+  const animationFrameId = useRef(null);
 
   const handleMouseMove = (event) => {
     if (!itemRef.current) return;
 
-    const { left, top, width, height } =
-      itemRef.current.getBoundingClientRect();
+    // Use requestAnimationFrame for smoother updates
+    if (animationFrameId.current) {
+      cancelAnimationFrame(animationFrameId.current);
+    }
 
-    const relativeX = (event.clientX - left) / width;
-    const relativeY = (event.clientY - top) / height;
+    animationFrameId.current = requestAnimationFrame(() => {
+      const { left, top, width, height } =
+        itemRef.current.getBoundingClientRect();
 
-    const tiltX = (relativeY - 0.5) * 5;
-    const tiltY = (relativeX - 0.5) * -5;
+      const relativeX = (event.clientX - left) / width;
+      const relativeY = (event.clientY - top) / height;
 
-    const newTransform = `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(.95, .95, .95)`;
-    setTransformStyle(newTransform);
+      const tiltX = (relativeY - 0.5) * 5;
+      const tiltY = (relativeX - 0.5) * -5;
+
+      const newTransform = `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(.95, .95, .95)`;
+      setTransformStyle(newTransform);
+    });
   };
 
   const handleMouseLeave = () => {
     setTransformStyle("");
   };
+
+  useEffect(() => {
+    return () => {
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, []);
 
   return (
     <div
@@ -42,19 +58,35 @@ export const BentoCard = ({ src, title, description, isComingSoon }) => {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [hoverOpacity, setHoverOpacity] = useState(0);
   const hoverButtonRef = useRef(null);
+  const animationFrameId = useRef(null);
 
   const handleMouseMove = (event) => {
     if (!hoverButtonRef.current) return;
-    const rect = hoverButtonRef.current.getBoundingClientRect();
 
-    setCursorPosition({
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
+    // Use requestAnimationFrame for smoother updates
+    if (animationFrameId.current) {
+      cancelAnimationFrame(animationFrameId.current);
+    }
+
+    animationFrameId.current = requestAnimationFrame(() => {
+      const rect = hoverButtonRef.current.getBoundingClientRect();
+      setCursorPosition({
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      });
     });
   };
 
   const handleMouseEnter = () => setHoverOpacity(1);
   const handleMouseLeave = () => setHoverOpacity(0);
+
+  useEffect(() => {
+    return () => {
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="relative size-full">
@@ -63,6 +95,7 @@ export const BentoCard = ({ src, title, description, isComingSoon }) => {
         loop
         muted
         autoPlay
+        preload="metadata" // Load only metadata initially
         className="absolute left-0 top-0 size-full object-cover object-center opacity-80"
       />
       <div className="relative z-10 flex size-full flex-col justify-between p-5 text-blue-50">
@@ -164,9 +197,10 @@ const Features = () => (
             </p>
 
             <img
-              src={"/img/transparent.svg"}
+              src={"/img/transparent.webp"} // Use WebP format for better compression
               alt="Icon"
               className="left-1 bottom-2 w-24 h-24"
+              loading="lazy" // Lazy load images
             />
           </div>
         </BentoTilt>
@@ -177,6 +211,7 @@ const Features = () => (
             loop
             muted
             autoPlay
+            preload="metadata" // Load only metadata initially
             className="size-full object-cover object-center opacity-80"
           />
         </BentoTilt>

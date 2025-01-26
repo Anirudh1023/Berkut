@@ -36,7 +36,7 @@ const Contact = () => {
 
           <AnimatedTitle
             title="let&#39;s create one of the most unforgettable experiences of your life!"
-            containerClass="mt-5 pointer-events-none mix-blend-overlay relative z-10"
+            containerClass="mt-5 pointer-events-none mix-blend-difference relative z-10"
           />
 
           <Button
