@@ -197,7 +197,7 @@ const Features = () => (
             </p>
 
             <img
-              src={"/img/transparent.webp"} // Use WebP format for better compression
+              src={"/img/transparent.png"} // Use WebP format for better compression
               alt="Icon"
               className="left-1 bottom-2 w-24 h-24"
               loading="lazy" // Lazy load images

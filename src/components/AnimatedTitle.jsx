@@ -13,7 +13,7 @@ const AnimatedTitle = memo(({ title, containerClass }) => {
       const titleAnimation = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top 80%", // Adjust the start position
+          start: "top 40%", // Adjust the start position
           end: "bottom 20%", // Adjust the end position
           toggleActions: "play none none reverse",
           scrub: 1, // Add scrub for smoother transitions
