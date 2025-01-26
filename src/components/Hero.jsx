@@ -5,17 +5,30 @@ import { TiLocationArrow } from "react-icons/ti";
 import Button from "./Button";
 import gsap from "gsap";
 
-// Custom hook to track mouse position
+// Custom hook to track mouse position with throttling
 const useMousePosition = () => {
   const [mousePosition, setMousePosition] = useState({ x: null, y: null });
 
-  const updateMousePosition = (e) => {
-    setMousePosition({ x: e.clientX, y: e.clientY });
-  };
-
   useEffect(() => {
+    let animationFrameId;
+
+    const updateMousePosition = (e) => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+
+      animationFrameId = requestAnimationFrame(() => {
+        setMousePosition({ x: e.clientX, y: e.clientY });
+      });
+    };
+
     window.addEventListener("mousemove", updateMousePosition);
-    return () => window.removeEventListener("mousemove", updateMousePosition);
+    return () => {
+      window.removeEventListener("mousemove", updateMousePosition);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, []);
 
   return mousePosition;
@@ -50,7 +63,7 @@ export default function Home() {
   // Flag to prevent multiple updates
   const isUpdatedRef = useRef(false);
 
-  // Track mouse movement
+  // Track mouse movement with debouncing
   useEffect(() => {
     let movementTimer;
 
@@ -73,7 +86,6 @@ export default function Home() {
 
   // Handle click to cycle through images with GSAP animation
   const handleClick = () => {
-    console.log("Mask Ref:", maskRef.current); // Debugging
     if (!maskRef.current) return; // Ensure the ref exists
 
     // Reset the flag
@@ -96,7 +108,6 @@ export default function Home() {
         }
       },
       onComplete: () => {
-        console.log(currentIndex, nextIndex); // Debugging
         setNextIndex((prevIndex) => (prevIndex + 1) % images.length);
         gsap.set(maskRef.current, {
           maskSize: `${size}px`,
@@ -132,6 +143,7 @@ export default function Home() {
             src={images[nextIndex]} // Current image
             alt={`Image ${currentIndex + 1}`}
             className="w-full h-full object-cover"
+            loading="lazy" // Lazy load images
           />
         </div>
       </motion.div>
@@ -143,11 +155,12 @@ export default function Home() {
             src={images[currentIndex]} // Next image in the cycle
             alt={`Image ${((currentIndex + 1) % images.length) + 1}`}
             className="w-full h-full object-cover"
+            loading="lazy" // Lazy load images
           />
         </div>
       </div>
 
-      {/* Text and Button Elements from the First Code */}
+      {/* Text and Button Elements */}
       <h1 className="font-futura-hv hero-heading absolute bottom-5 right-5 z-40 text-berkut-skin">
         TRAVEL
       </h1>
