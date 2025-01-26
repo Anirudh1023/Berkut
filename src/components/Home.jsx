@@ -38,7 +38,7 @@ const App = () => {
             trigger: document.body,
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.5, // Reduced scrub value for smoother performance
+            scrub: 0.2, // Reduced scrub value for smoother performance
           },
         });
       }
@@ -50,7 +50,7 @@ const App = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-screen">
+    <div className="relative min-h-screen w-screen overflow-hidden">
       <div className="animation">
         {[
           {
@@ -85,11 +85,11 @@ const App = () => {
             className="animation_layer parallax"
             id={id}
             style={{
-              willChange: "transform",
               backgroundImage: `url(${imagePath})`,
               backgroundPosition: "bottom center",
               backgroundSize: "auto 1038px",
               backgroundRepeat: "repeat-x",
+              transform: "translate3d(0, 0, 0)", // Force hardware acceleration
             }}
           ></div>
         ))}
