@@ -53,22 +53,44 @@ const App = () => {
     <div className="relative min-h-screen w-screen">
       <div className="animation">
         {[
-          { ref: artbackRef, id: "artback" },
-          { ref: mountainRef, id: "mountain" },
-          { ref: jungle1Ref, id: "jungle1" },
-          { ref: jungle2Ref, id: "jungle2" },
-          { ref: jungle3Ref, id: "jungle3" },
-          { ref: logolandRef, id: "logoland" },
-          { ref: jungle4Ref, id: "jungle4" },
-          { ref: manonmountainRef, id: "manonmountain" },
-          { ref: jungle5Ref, id: "jungle5" },
-        ].map(({ ref, id }) => (
+          {
+            ref: artbackRef,
+            id: "artback",
+            imagePath: "/images/background.png",
+          },
+          {
+            ref: mountainRef,
+            id: "mountain",
+            imagePath: "/images/mountains.png",
+          },
+          { ref: jungle1Ref, id: "jungle1", imagePath: "/images/jungle1.png" },
+          { ref: jungle2Ref, id: "jungle2", imagePath: "/images/jungle2.png" },
+          { ref: jungle3Ref, id: "jungle3", imagePath: "/images/jungle3.png" },
+          {
+            ref: logolandRef,
+            id: "logoland",
+            imagePath: "/images/Transparent.png",
+          },
+          { ref: jungle4Ref, id: "jungle4", imagePath: "/images/jungle4.png" },
+          {
+            ref: manonmountainRef,
+            id: "manonmountain",
+            imagePath: "/images/man_on_mountain.png",
+          },
+          { ref: jungle5Ref, id: "jungle5", imagePath: "/images/jungle5.png" },
+        ].map(({ ref, id, imagePath }) => (
           <div
             key={id}
             ref={ref}
             className="animation_layer parallax"
             id={id}
-            style={{ willChange: "transform" }} // Promote to GPU layer
+            style={{
+              willChange: "transform",
+              backgroundImage: `url(${imagePath})`,
+              backgroundPosition: "bottom center",
+              backgroundSize: "auto 1038px",
+              backgroundRepeat: "repeat-x",
+            }}
           ></div>
         ))}
       </div>

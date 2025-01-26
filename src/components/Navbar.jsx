@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-// Animation variants
+// Animation variants (unchanged)
 const menuVariants = {
   open: {
     width: "480px",
@@ -92,7 +92,7 @@ function Nav() {
     <div className="flex flex-col justify-between p-[100px_40px_50px_40px] h-full box-border">
       <div className="flex flex-col gap-2.5">
         {links.map((link, i) => (
-          <div key={`b_${i}`} className="perspective-120 origin-bottom">
+          <div key={`b_${i}`} className="origin-bottom perspective-120">
             <motion.div
               custom={i}
               variants={perspective}
@@ -140,7 +140,7 @@ function Button({ isActive, toggleMenu }) {
         transition={{ duration: 0.5, type: "tween", ease: [0.76, 0, 0.24, 1] }}
       >
         <div
-          className="w-full h-full bg-[#E4A05F] flex items-center justify-center"
+          className="w-full h-full bg-[#E4A05F] flex items-center justify-center font-futura-hv"
           onClick={toggleMenu}
         >
           <PerspectiveText label="Menu" />
@@ -160,7 +160,7 @@ function Button({ isActive, toggleMenu }) {
 function PerspectiveText({ label }) {
   return (
     <div className="flex flex-col justify-center items-center h-full w-full transform-style-preserve-3d transition-transform duration-750 ease-custom">
-      <p className="transition-all duration-750 ease-custom pointer-events-none uppercase font-futura-hv">
+      <p className="transition-all duration-750 ease-custom pointer-events-none uppercase">
         {label}
       </p>
       <p className="absolute transform-origin-bottom-center transform-rotateX-[-90deg] translate-y-[9px] opacity-0 transition-all duration-750 ease-custom pointer-events-none uppercase">

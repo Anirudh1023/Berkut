@@ -11,7 +11,7 @@ const Contact = () => {
   return (
     <div
       id="contact"
-      className="my-20 min-h-96 w-screen  px-10 bg-berkut-light"
+      className="py-20 min-h-96 w-screen  px-10 bg-berkut-light"
     >
       <div className="relative rounded-lg bg-berkut-dark py-24 text-blue-50 sm:overflow-hidden">
         <div className="absolute -left-20 top-0 hidden h-full w-72 overflow-hidden sm:block lg:left-20 lg:w-96">
@@ -30,7 +30,7 @@ const Contact = () => {
         </div>
 
         <div className="flex flex-col items-center text-center">
-          <p className="mb-10 text-[12px] uppercase">
+          <p className="mb-10 text-[12px] uppercase z-50">
             Are You Excited For Your Next Adventure?
           </p>
 
