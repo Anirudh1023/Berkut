@@ -23,7 +23,7 @@ const App = () => {
       }}
     >
       <main className="relative min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-berkut-light">
-        {/* <Home /> */}
+        <Home />
         <Navbar />
         <Hero />
         <About />
