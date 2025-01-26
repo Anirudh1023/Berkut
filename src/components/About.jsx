@@ -63,6 +63,7 @@ const About = () => {
       borderRadius: 0,
       ease: "power2.inOut", // Add easing for smoother transitions
       duration: 2, // Increase duration for smoother transitions
+      will: "transform width height",
     });
   });
 
@@ -81,7 +82,7 @@ const About = () => {
           containerClass="mt-5 !text-berkut-tint text-center"
         />
 
-        <div className="about-subtext">
+        <div className="about-subtext will-change-[opacity]">
           <p>
             Small group adventures that bring you the moments only Berkut can
             offer.
@@ -97,7 +98,7 @@ const About = () => {
             key={currentIndex} // Add key prop to force re-render
             src={carouselItems[currentIndex].image}
             alt="Background"
-            className="absolute left-0 top-0 size-full object-cover will-change-[opacity]" // Added will-change here
+            className="absolute left-0 top-0 size-full object-cover will-change-[transform]" // Added will-change here
           />
           <div
             className="absolute top-20 left-20 text-berkut-skin font-futura-hv md:text-8xl text-3xl will-change-[transform]" // Added will-change for text animation
