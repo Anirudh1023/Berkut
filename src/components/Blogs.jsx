@@ -51,14 +51,6 @@ const BlogPost6 = () => {
   );
 };
 
-const InteractiveHoverButton = ({ buttonText }) => {
-  return (
-    <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-      {buttonText}
-    </button>
-  );
-};
-
 const data = [
   {
     category: "Maintenance Tips",
@@ -106,7 +98,7 @@ export default function Blogs() {
   return (
     <div
       id="blogs"
-      className="min-h-screen bg-berkut-light pt-10 relative overflow-x-hidden px-10 rounded-t-[100px]" // Very rounded top corners
+      className="min-h-screen bg-berkut-light pt-10 relative overflow-x-hidden px-4 sm:px-10 rounded-t-[50px] sm:rounded-t-[100px]"
     >
       <div className="relative z-10 w-full">
         <div className="text-center mb-8">

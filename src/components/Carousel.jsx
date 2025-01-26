@@ -36,7 +36,7 @@ export const CarouselContext = createContext({
   currentIndex: 0,
 });
 
-export const BlurImage = ({ src, className, alt, ...rest }) => {
+export const BlurImage = React.memo(({ src, className, alt, ...rest }) => {
   const [isLoading, setLoading] = useState(true);
   return (
     <img
@@ -52,9 +52,9 @@ export const BlurImage = ({ src, className, alt, ...rest }) => {
       {...rest}
     />
   );
-};
+});
 
-export const Card = ({ card, index, layout = false }) => {
+export const Card = React.memo(({ card, index, layout = false }) => {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
   const { onCardClose } = useContext(CarouselContext);
@@ -150,12 +150,67 @@ export const Card = ({ card, index, layout = false }) => {
       </motion.div>
     </>
   );
-};
+});
 
 export const Carousel = ({ items, initialScroll = 0 }) => {
+  const carouselRef = useRef(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+
+  const scroll = (direction) => {
+    if (carouselRef.current) {
+      const { scrollLeft, clientWidth } = carouselRef.current;
+      const scrollAmount = direction === "left" ? -clientWidth : clientWidth;
+      carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  const handleScroll = () => {
+    if (carouselRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+      setShowLeftArrow(scrollLeft > 0);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth);
+    }
+  };
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (carousel) {
+      carousel.addEventListener("scroll", handleScroll);
+      handleScroll(); // Initial check
+    }
+    return () => {
+      if (carousel) {
+        carousel.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+
   return (
     <div className="relative w-full px-4">
-      <div className="flex flex-row justify-start gap-4 overflow-x-auto no-scrollbar">
+      {showLeftArrow && (
+        <button
+          aria-label="Scroll left"
+          onClick={() => scroll("left")}
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black/50 rounded-full p-2 z-20"
+        >
+          <TiArrowLeft className="h-6 w-6 text-white" />
+        </button>
+      )}
+      {showRightArrow && (
+        <button
+          aria-label="Scroll right"
+          onClick={() => scroll("right")}
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black/50 rounded-full p-2 z-20"
+        >
+          <TiArrowRight className="h-6 w-6 text-white" />
+        </button>
+      )}
+      <div
+        ref={carouselRef}
+        className="flex flex-row justify-start gap-4 overflow-x-auto no-scrollbar scroll-snap-type-x-mandatory scroll-snap-align-start"
+        style={{ scrollBehavior: "smooth" }}
+      >
         {items.map((item, index) => (
           <motion.div
             initial={{
@@ -173,7 +228,7 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
               },
             }}
             key={"card" + index}
-            className="rounded-3xl flex-shrink-0"
+            className="rounded-3xl flex-shrink-0 scroll-snap-align-start"
           >
             {item}
           </motion.div>

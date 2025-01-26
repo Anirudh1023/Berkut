@@ -5,15 +5,15 @@ import { AnimatePresence, motion } from "framer-motion";
 // Animation variants (unchanged)
 const menuVariants = {
   open: {
-    width: "480px",
-    height: "650px",
-    top: "-25px",
-    right: "-25px",
+    width: ["100%", "480px"], // Responsive width for mobile and desktop
+    height: ["100vh", "650px"], // Responsive height for mobile and desktop
+    top: ["0px", "-25px"],
+    right: ["0px", "-25px"],
     transition: { duration: 0.75, type: "tween", ease: [0.76, 0, 0.24, 1] },
   },
   closed: {
-    width: "100px",
-    height: "40px",
+    width: ["100px", "100px"], // Keep button width consistent
+    height: ["40px", "40px"], // Keep button height consistent
     top: "0px",
     right: "0px",
     transition: {
