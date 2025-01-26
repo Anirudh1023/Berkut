@@ -5,15 +5,15 @@ import { AnimatePresence, motion } from "framer-motion";
 // Animation variants (unchanged)
 const menuVariants = {
   open: {
-    width: ["100%", "480px"], // Responsive width for mobile and desktop
-    height: ["100vh", "650px"], // Responsive height for mobile and desktop
-    top: ["0px", "-25px"],
-    right: ["0px", "-25px"],
+    width: "400px",
+    height: "650px",
+    top: "-25px",
+    right: "-25px",
     transition: { duration: 0.75, type: "tween", ease: [0.76, 0, 0.24, 1] },
   },
   closed: {
-    width: ["100px", "100px"], // Keep button width consistent
-    height: ["40px", "40px"], // Keep button height consistent
+    width: "100px",
+    height: "40px",
     top: "0px",
     right: "0px",
     transition: {
@@ -177,7 +177,7 @@ export default function Navbar() {
   return (
     <div className="fixed right-[50px] top-[50px] z-50">
       <motion.div
-        className="bg-[#E4A05F] rounded-[25px] relative"
+        className="bg-[#E4A05F] rounded-[25px] relative !width-500px md:!width-300px"
         variants={menuVariants}
         animate={isActive ? "open" : "closed"}
         initial="closed"
