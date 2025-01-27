@@ -23,9 +23,9 @@ const App = () => {
       }}
     >
       <main className="relative min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-berkut-light">
-        <div className="hidden md:block">
-          <Home />
-        </div>
+        {/* <div className="hidden md:block"> */}
+        <Home />
+        {/* </div> */}
         <Navbar />
         <Hero />
         <About />
