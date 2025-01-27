@@ -105,7 +105,7 @@ export default function Blogs() {
         <div className="text-center mb-8">
           <AnimatedTitle
             title="Get inspired on The Good Times"
-            containerClass="mt-5 pointer-events-none !text-berkut-dark relative z-10"
+            containerClass="mt-5 pointer-events-none !text-berkut-dark z-10"
           />
           <p className="text-lg text-neutral-600 dark:text-neutral-400 mt-5">
             Click on the card to know more
