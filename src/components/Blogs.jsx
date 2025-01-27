@@ -1,55 +1,56 @@
-import React from "react";
+import React, { memo } from "react";
 import { Carousel, Card } from "./Carousel";
 import Button from "./Button";
 import AnimatedTitle from "./AnimatedTitle";
 
-const BlogPost1 = () => {
+// Memoize BlogPost components to prevent unnecessary re-renders
+const BlogPost1 = memo(() => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Previous BlogPost1 content remains the same */}
     </div>
   );
-};
+});
 
-const BlogPost2 = () => {
+const BlogPost2 = memo(() => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Previous BlogPost2 content remains the same */}
     </div>
   );
-};
+});
 
-const BlogPost3 = () => {
+const BlogPost3 = memo(() => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Previous BlogPost3 content remains the same */}
     </div>
   );
-};
+});
 
-const BlogPost4 = () => {
+const BlogPost4 = memo(() => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Previous BlogPost4 content remains the same */}
     </div>
   );
-};
+});
 
-const BlogPost5 = () => {
+const BlogPost5 = memo(() => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Previous BlogPost5 content remains the same */}
     </div>
   );
-};
+});
 
-const BlogPost6 = () => {
+const BlogPost6 = memo(() => {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       {/* Previous BlogPost6 content remains the same */}
     </div>
   );
-};
+});
 
 const data = [
   {

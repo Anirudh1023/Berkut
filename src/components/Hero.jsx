@@ -1,34 +1,30 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { TiLocationArrow } from "react-icons/ti";
 import Button from "./Button";
 import gsap from "gsap";
 
-// Custom hook to track mouse position with throttling
+// Debounce function to limit the frequency of mouse move events
+const debounce = (func, wait) => {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+};
+
+// Custom hook to track mouse position with debouncing
 const useMousePosition = () => {
   const [mousePosition, setMousePosition] = useState({ x: null, y: null });
 
   useEffect(() => {
-    let animationFrameId;
-
-    const updateMousePosition = (e) => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-
-      animationFrameId = requestAnimationFrame(() => {
-        setMousePosition({ x: e.clientX, y: e.clientY });
-      });
-    };
+    const updateMousePosition = debounce((e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    }, 16); // ~60fps
 
     window.addEventListener("mousemove", updateMousePosition);
-    return () => {
-      window.removeEventListener("mousemove", updateMousePosition);
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-    };
+    return () => window.removeEventListener("mousemove", updateMousePosition);
   }, []);
 
   return mousePosition;
@@ -36,12 +32,11 @@ const useMousePosition = () => {
 
 export default function Home() {
   const [isMouseMoving, setIsMouseMoving] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0); // Track current image index
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState(1);
   const { x, y } = useMousePosition();
-  const size = isMouseMoving ? 250 : 100; // Large when moving, small when stationary
+  const size = isMouseMoving ? 250 : 100;
 
-  // Define the images array
   const images = [
     "img/Hero3.jpg",
     "img/Hero5.jpg",
@@ -51,60 +46,41 @@ export default function Home() {
     "img/Hero6.jpg",
   ];
 
-  // Ref for the mask element
   const maskRef = useRef(null);
-
-  // Ref to track currentIndex independently of React state
   const currentIndexRef = useRef(currentIndex);
-  useEffect(() => {
-    currentIndexRef.current = currentIndex; // Sync ref with state
-  }, [currentIndex]);
-
-  // Flag to prevent multiple updates
   const isUpdatedRef = useRef(false);
 
-  // Track mouse movement with debouncing
   useEffect(() => {
-    let movementTimer;
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
 
-    const handleMouseMove = () => {
-      setIsMouseMoving(true); // Mouse is moving
-      clearTimeout(movementTimer);
-
-      // Set a timeout to detect when the mouse stops moving
-      movementTimer = setTimeout(() => {
-        setIsMouseMoving(false); // Mouse has stopped moving
-      }, 100); // Adjust the delay as needed
-    };
+  useEffect(() => {
+    const handleMouseMove = debounce(() => {
+      setIsMouseMoving(true);
+      setTimeout(() => setIsMouseMoving(false), 100);
+    }, 16);
 
     window.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      clearTimeout(movementTimer);
-    };
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Handle click to cycle through images with GSAP animation
-  const handleClick = () => {
-    if (!maskRef.current) return; // Ensure the ref exists
+  const handleClick = useCallback(() => {
+    if (!maskRef.current) return;
 
-    // Reset the flag
     isUpdatedRef.current = false;
 
     const animation = gsap.to(maskRef.current, {
       maskSize: "150%",
       WebkitMaskPosition: "center",
-      duration: 2,
+      duration: 1, // Reduced duration
       ease: "power1.inOut",
       onUpdate: () => {
-        // Access the progress of the animation
         const progress = animation.progress();
         if (progress > 0.7 && !isUpdatedRef.current) {
-          // Update currentIndex using the ref
           const newIndex = (currentIndexRef.current + 1) % images.length;
-          setCurrentIndex(newIndex); // Update state
-          currentIndexRef.current = newIndex; // Update ref
-          isUpdatedRef.current = true; // Set the flag to prevent further updates
+          setCurrentIndex(newIndex);
+          currentIndexRef.current = newIndex;
+          isUpdatedRef.current = true;
         }
       },
       onComplete: () => {
@@ -115,14 +91,13 @@ export default function Home() {
         });
       },
     });
-  };
+  }, [images.length, size, x, y]);
 
   return (
     <main
       className="h-screen relative flex items-center justify-center z-10 bg-white overflow-hidden"
-      onClick={handleClick} // Click to cycle images
+      onClick={handleClick}
     >
-      {/* Mask Section */}
       <motion.div
         ref={maskRef}
         className="absolute w-full h-full flex items-center justify-center cursor-default"
@@ -136,31 +111,29 @@ export default function Home() {
           WebkitMaskPosition: `${x - size / 2}px ${y - size / 2}px`,
           WebkitMaskSize: `${size}px`,
         }}
-        transition={{ type: "tween", ease: "backOut", duration: 0.5 }}
+        transition={{ type: "tween", ease: "backOut", duration: 0.3 }} // Reduced duration
       >
         <div className="w-full h-full">
           <img
-            src={images[nextIndex]} // Current image
+            src={images[nextIndex]}
             alt={`Image ${currentIndex + 1}`}
             className="w-full h-full object-cover"
-            loading="lazy" // Lazy load images
+            loading="lazy"
           />
         </div>
       </motion.div>
 
-      {/* Body Section */}
       <div className="w-full h-full flex items-center justify-center cursor-default">
         <div className="w-full h-full">
           <img
-            src={images[currentIndex]} // Next image in the cycle
+            src={images[currentIndex]}
             alt={`Image ${((currentIndex + 1) % images.length) + 1}`}
             className="w-full h-full object-cover"
-            loading="lazy" // Lazy load images
+            loading="lazy"
           />
         </div>
       </div>
 
-      {/* Text and Button Elements */}
       <h1 className="font-futura-hv hero-heading absolute bottom-5 right-5 z-40 text-berkut-skin">
         TRAVEL
       </h1>
@@ -175,7 +148,7 @@ export default function Home() {
             Small group adventures that bring you the moments only Intrepid can
             offer.
             <br />
-            Only here. Only now. Only Intrepid.
+            Only here. Only now. Only Berkut.
           </p>
 
           <Button

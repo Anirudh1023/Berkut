@@ -4,9 +4,19 @@ import React, {
   useState,
   createContext,
   useContext,
+  useCallback,
 } from "react";
 import { TiArrowLeft, TiArrowRight, TiTimes } from "react-icons/ti";
 import { AnimatePresence, motion } from "framer-motion";
+
+// Debounce function to limit the frequency of updates
+const debounce = (func, wait) => {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+};
 
 const cn = (...classes) => {
   return classes.filter(Boolean).join(" ");
@@ -165,13 +175,16 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
     }
   };
 
-  const handleScroll = () => {
-    if (carouselRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-      setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth);
-    }
-  };
+  const handleScroll = useCallback(
+    debounce(() => {
+      if (carouselRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+        setShowLeftArrow(scrollLeft > 0);
+        setShowRightArrow(scrollLeft < scrollWidth - clientWidth);
+      }
+    }, 100), // Adjust debounce delay as needed
+    []
+  );
 
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -184,7 +197,7 @@ export const Carousel = ({ items, initialScroll = 0 }) => {
         carousel.removeEventListener("scroll", handleScroll);
       }
     };
-  }, []);
+  }, [handleScroll]);
 
   return (
     <div className="relative w-full px-4">
